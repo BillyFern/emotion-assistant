@@ -52,19 +52,29 @@ async function main(){
 
     });
 
-    faceDetection.onResults(results => {
+    faceDetection.onResults(results=>{
 
-        console.log(results);
+        ctx.clearRect(0,0,canvas.width,canvas.height);
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        if (!results.detections || results.detections.length === 0) {
-            console.log("No face detected");
+        if(results.detections.length===0)
             return;
-        }
 
-        console.log("Face detected!");
+        const bbox = results.detections[0].locationData.relativeBoundingBox;
 
+        const x = bbox.xMin * canvas.width;
+        const y = bbox.yMin * canvas.height;
+        const w = bbox.width * canvas.width;
+        const h = bbox.height * canvas.height;
+
+        ctx.strokeStyle = "lime";
+        ctx.lineWidth = 3;
+
+        ctx.strokeRect(
+            x,
+            y,
+            w,
+            h
+        );
     });
 
     const camera=new Camera(video,{
