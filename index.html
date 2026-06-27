@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 
@@ -15,7 +15,23 @@
 
     <h1>Emotion Assistant</h1>
 
-    <p>If you can see this page, GitHub Pages is working!</p>
+    <div class="container">
+
+        <video id="webcam" autoplay playsinline></video>
+
+        <canvas id="overlay"></canvas>
+
+        <div class="info">
+
+            <h2 id="emotion">Detecting...</h2>
+
+            <p id="assistant">
+                Hello! I'm ready whenever you are.
+            </p>
+
+        </div>
+
+    </div>
 
     <script src="script.js"></script>
 
