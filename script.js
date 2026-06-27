@@ -54,27 +54,7 @@ async function main(){
 
     faceDetection.onResults(results=>{
 
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-
-        if(results.detections.length===0)
-            return;
-
-        const bbox = results.detections[0].locationData.relativeBoundingBox;
-
-        const x = bbox.xMin * canvas.width;
-        const y = bbox.yMin * canvas.height;
-        const w = bbox.width * canvas.width;
-        const h = bbox.height * canvas.height;
-
-        ctx.strokeStyle = "lime";
-        ctx.lineWidth = 3;
-
-        ctx.strokeRect(
-            x,
-            y,
-            w,
-            h
-        );
+        console.log(JSON.stringify(results.detections[0], null, 2));
     });
 
     const camera=new Camera(video,{
