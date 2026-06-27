@@ -2,7 +2,7 @@ let emotionModel = null;
 
 async function loadEmotionModel() {
 
-    emotionModel = await tf.loadLayersModel(
+    emotionModel = await tf.loadGraphModel(
         "./model/model.json"
     );
 
