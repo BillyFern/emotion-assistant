@@ -41,27 +41,27 @@ canvas{
 }
 
 .info{
-
-    width:640px;
-
-    background:#303030;
-
+    width:320px;
     padding:20px;
-
-    border-radius:15px;
-
+    background:#222;
+    color:white;
+    border-radius:12px;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
 }
 
 #emotion{
-
+    margin:0;
     color:#4CAF50;
-
+    font-size:28px;
 }
 
 #assistant{
-
-    font-size:20px;
-
+    margin:0;
+    font-size:18px;
+    line-height:1.6;
+    color:#ddd;
 }
 
 .camera{

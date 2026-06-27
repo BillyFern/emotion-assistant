@@ -1,3 +1,6 @@
+const emotionText = document.getElementById("emotion");
+const assistantText = document.getElementById("assistant");
+
 let emotionModel = null;
 
 async function loadEmotionModel() {
@@ -261,15 +264,6 @@ function drawLabel() {
         lastBox.x + 8,
         lastBox.y - 38
     );
-
-    ctx.font = "16px Arial";
-
-    ctx.fillText(
-        assistantMessage,
-        lastBox.x + 8,
-        lastBox.y - 12
-    );
-
 }
 
 async function main() {
@@ -427,7 +421,8 @@ async function main() {
 
             displayEmotion = detectedEmotion;
             displayConfidence = confidence;
-
+            emotionText.textContent =
+                `${displayEmotion} (${(displayConfidence * 100).toFixed(1)}%)`;
             //------------------------------------
             // Emotion changed
             //------------------------------------
@@ -448,6 +443,7 @@ async function main() {
                         randomResponse(
                             transitionResponses[transition]
                         );
+                    assistantText.textContent = assistantMessage;
 
                 }
                 else {
@@ -456,6 +452,7 @@ async function main() {
                         randomResponse(
                             stableResponses[currentEmotion]
                         );
+                    assistantText.textContent = assistantMessage;
 
                 }
 
