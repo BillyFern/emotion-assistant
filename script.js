@@ -1,3 +1,29 @@
+let emotionModel = null;
+
+async function loadEmotionModel() {
+
+    emotionModel = await tf.loadLayersModel(
+        "./model/model.json"
+    );
+
+    console.log("Emotion model loaded!");
+}
+
+const faceCanvas = document.createElement("canvas");
+faceCanvas.width = 48;
+faceCanvas.height = 48;
+
+const faceCtx = faceCanvas.getContext("2d");
+
+const classNames = [
+    "Angry",
+    "Fearful",
+    "Happy",
+    "Neutral",
+    "Sad",
+    "Surprised"
+];
+
 const video = document.getElementById("webcam");
 const canvas = document.getElementById("overlay");
 const ctx = canvas.getContext("2d");
@@ -34,6 +60,7 @@ async function setupCamera(){
 
 async function main(){
 
+    await loadEmotionModel();
     await setupCamera();
 
     const faceDetection = new FaceDetection({
@@ -76,6 +103,49 @@ async function main(){
             w,
             h
         );
+
+        // Crop detected face
+        faceCtx.drawImage(
+            video,
+            x,
+            y,
+            w,
+            h,
+            0,
+            0,
+            48,
+            48
+        );
+
+        // Convert to Tensor
+        let input = tf.browser.fromPixels(faceCanvas);
+
+        input = input.toFloat();
+
+        input = input.expandDims(0);
+
+        const prediction = emotionModel.predict(input);
+
+        prediction.data().then(probabilities=>{
+
+            let maxIndex = 0;
+
+            for(let i=1;i<probabilities.length;i++){
+
+                if(probabilities[i] > probabilities[maxIndex])
+                    maxIndex = i;
+
+            }
+
+            console.log(
+                classNames[maxIndex],
+                probabilities[maxIndex]
+            );
+
+            input.dispose();
+            prediction.dispose();
+
+        });
 
     });
 
