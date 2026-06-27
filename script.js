@@ -234,36 +234,33 @@ function randomResponse(list) {
 
 function drawLabel() {
 
-    const boxHeight = 65;
-
-    ctx.fillStyle = "black";
-
-    ctx.fillRect(
-        lastBox.x,
-        lastBox.y - boxHeight,
-        350,
-        boxHeight
-    );
-
-    ctx.strokeStyle = "white";
-    ctx.lineWidth = 1;
-
-    ctx.strokeRect(
-        lastBox.x,
-        lastBox.y - boxHeight,
-        350,
-        boxHeight
-    );
-
-    ctx.fillStyle = "white";
+    const text = `${displayEmotion} (${(displayConfidence * 100).toFixed(1)}%)`;
 
     ctx.font = "bold 18px Arial";
 
-    ctx.fillText(
-        `${displayEmotion} (${(displayConfidence*100).toFixed(1)}%)`,
-        lastBox.x + 8,
-        lastBox.y - 38
-    );
+    // Measure text width
+    const padding = 10;
+    const textMetrics = ctx.measureText(text);
+    const textWidth = textMetrics.width;
+
+    const boxWidth = textWidth + padding * 2;
+    const boxHeight = 40;
+
+    const boxX = lastBox.x;
+    const boxY = lastBox.y - boxHeight;
+
+    // Draw black background
+    ctx.fillStyle = "black";
+    ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+
+    // Draw white border
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+
+    // Draw text
+    ctx.fillStyle = "white";
+    ctx.fillText(text, boxX + padding, boxY + 25);
 }
 
 async function main() {
