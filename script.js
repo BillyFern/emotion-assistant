@@ -52,24 +52,18 @@ async function main(){
 
     });
 
-    faceDetection.onResults(results=>{
+    faceDetection.onResults(results => {
 
-        ctx.clearRect(0,0,canvas.width,canvas.height);
+        console.log(results);
 
-        if(results.detections.length===0)
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (!results.detections || results.detections.length === 0) {
+            console.log("No face detected");
             return;
+        }
 
-        const box=results.detections[0].boundingBox;
-
-        ctx.strokeStyle="lime";
-        ctx.lineWidth=3;
-
-        ctx.strokeRect(
-            box.xCenter-box.width/2,
-            box.yCenter-box.height/2,
-            box.width,
-            box.height
-        );
+        console.log("Face detected!");
 
     });
 
