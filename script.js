@@ -48,6 +48,145 @@ let displayConfidence = 0;
 // Last detected face
 let lastBox = null;
 
+// -------------------------
+// Assistant
+// -------------------------
+
+let assistantMessage = "Hello!";
+
+let currentEmotion = null;
+let previousEmotion = null;
+
+let emotionStartTime = Date.now();
+
+const stableDuration = 3000;     // 3 seconds
+const messageCooldown = 8000;    // 8 seconds
+
+let lastMessageTime = 0;
+
+const stableResponses = {
+
+    Happy: [
+
+        "You seem very happy today!",
+        "Keep smiling!",
+        "Looks like something made your day.",
+        "It's nice seeing you in a good mood."
+
+    ],
+
+    Neutral: [
+
+        "What's on your mind today?",
+        "Hope you're having a good day.",
+        "Anything interesting happening today?",
+        "How has your day been so far?"
+
+    ],
+
+    Sad: [
+
+        "I hope things get better soon.",
+        "Take things one step at a time.",
+        "Remember to be kind to yourself.",
+        "Tomorrow is another opportunity."
+
+    ],
+
+    Angry: [
+
+        "Try taking a slow deep breath.",
+        "Maybe a short break could help.",
+        "Hopefully things calm down soon.",
+        "Don't let one moment ruin your day."
+
+    ],
+
+    Fearful: [
+
+        "Everything will be okay.",
+        "Take your time.",
+        "One step at a time.",
+        "You're doing just fine."
+
+    ],
+
+    Surprised: [
+
+        "That caught you off guard!",
+        "Something unexpected happened?",
+        "Quite a reaction!",
+        "Well, that was surprising."
+
+    ]
+
+};
+
+const transitionResponses = {
+
+    "Neutral->Happy": [
+
+        "Something made you smile!",
+        "Looks like your mood improved!",
+        "Glad to see that smile."
+
+    ],
+
+    "Happy->Sad": [
+
+        "That was quite a mood change.",
+        "Hope everything is okay.",
+        "I hope things get better."
+
+    ],
+
+    "Sad->Happy": [
+
+        "That's wonderful to see!",
+        "Glad things are looking brighter.",
+        "Welcome back, smile!"
+
+    ],
+
+    "Angry->Neutral": [
+
+        "Looks like you've calmed down.",
+        "Feeling a little better?",
+        "That's good to see."
+
+    ],
+
+    "Neutral->Angry": [
+
+        "Something bothering you?",
+        "Take it easy.",
+        "Maybe take a short break."
+
+    ],
+
+    "Fearful->Neutral": [
+
+        "You seem more relaxed now.",
+        "Glad you're feeling calmer."
+
+    ],
+
+    "Neutral->Fearful": [
+
+        "Everything alright?",
+        "Take a deep breath."
+
+    ],
+
+    "Surprised->Happy": [
+
+        "Hopefully it was good news!",
+        "Looks like it made your day."
+
+    ]
+
+};
+
 const video = document.getElementById("webcam");
 const canvas = document.getElementById("overlay");
 const ctx = canvas.getContext("2d");
@@ -82,34 +221,51 @@ async function setupCamera() {
 
 }
 
+function randomResponse(list) {
+
+    return list[
+        Math.floor(Math.random() * list.length)
+    ];
+
+}
+
 function drawLabel() {
+
+    const boxHeight = 65;
 
     ctx.fillStyle = "black";
 
     ctx.fillRect(
         lastBox.x,
-        lastBox.y - 35,
-        220,
-        30
+        lastBox.y - boxHeight,
+        350,
+        boxHeight
     );
 
     ctx.strokeStyle = "white";
-
     ctx.lineWidth = 1;
 
     ctx.strokeRect(
         lastBox.x,
-        lastBox.y - 35,
-        220,
-        30
+        lastBox.y - boxHeight,
+        350,
+        boxHeight
     );
 
     ctx.fillStyle = "white";
 
-    ctx.font = "20px Arial";
+    ctx.font = "bold 18px Arial";
 
     ctx.fillText(
-        `${displayEmotion} (${(displayConfidence * 100).toFixed(1)}%)`,
+        `${displayEmotion} (${(displayConfidence*100).toFixed(1)}%)`,
+        lastBox.x + 8,
+        lastBox.y - 38
+    );
+
+    ctx.font = "16px Arial";
+
+    ctx.fillText(
+        assistantMessage,
         lastBox.x + 8,
         lastBox.y - 12
     );
@@ -267,8 +423,69 @@ async function main() {
 
         if (confidence >= 0.60) {
 
-            displayEmotion = classNames[maxIndex];
+            const detectedEmotion = classNames[maxIndex];
+
+            displayEmotion = detectedEmotion;
             displayConfidence = confidence;
+
+            //------------------------------------
+            // Emotion changed
+            //------------------------------------
+
+            if (detectedEmotion !== currentEmotion) {
+
+                previousEmotion = currentEmotion;
+                currentEmotion = detectedEmotion;
+
+                emotionStartTime = Date.now();
+
+                const transition =
+                    `${previousEmotion}->${currentEmotion}`;
+
+                if (transitionResponses[transition]) {
+
+                    assistantMessage =
+                        randomResponse(
+                            transitionResponses[transition]
+                        );
+
+                }
+                else {
+
+                    assistantMessage =
+                        randomResponse(
+                            stableResponses[currentEmotion]
+                        );
+
+                }
+
+                lastMessageTime = Date.now();
+
+            }
+
+            //------------------------------------
+            // Emotion stayed stable
+            //------------------------------------
+
+            else {
+
+                if (
+
+                    Date.now() - emotionStartTime >= stableDuration &&
+                    Date.now() - lastMessageTime >= messageCooldown
+
+                ) {
+
+                    assistantMessage =
+                        randomResponse(
+                            stableResponses[currentEmotion]
+                        );
+
+                    lastMessageTime = Date.now();
+
+                }
+
+            }
 
         }
 
